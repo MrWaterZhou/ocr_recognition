@@ -71,7 +71,7 @@ def get_rotate_crop_image(img, points):
     return dst_img, _label
 
 
-def load_mtwi_label(file):
+def load_mtwi_label(file, language=None):
     with open(file) as f:
         labels = []
         for label in f:
@@ -80,7 +80,11 @@ def load_mtwi_label(file):
             points = []
             for i in range(4):
                 points.append((float(label[2 * i]), float(label[2 * i + 1])))
-            labels.append((text, points))
+            if language is None:
+                labels.append((text, points))
+            else:
+                if label[-2] in language:
+                    labels.append((text, points))
     return labels
 
 
@@ -88,6 +92,7 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
     label_path = sys.argv[2]
     save_path = sys.argv[3]
+    language = sys.argv[4].split(',') if len(sys.argv) > 4 else None
 
     os.makedirs(save_path, exist_ok=True)
     results = open(save_path + '.txt', 'w')
@@ -101,7 +106,7 @@ if __name__ == '__main__':
             label_file = os.path.join(label_path, label_file)
 
             image = cv2.imread(image_file)
-            labels = load_mtwi_label(label_file)
+            labels = load_mtwi_label(label_file, language)
             for j, label in enumerate(labels):
                 dst_img, rotate = get_rotate_crop_image(image, label[1])
                 img_file = os.path.join(save_path, '{}_{}_{}.jpg'.format(i, j, rotate))
