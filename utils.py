@@ -112,7 +112,7 @@ if __name__ == '__main__':
                 img_file = os.path.join(save_path, '{}_{}_{}.jpg'.format(i, j, rotate))
                 cv2.imwrite(img_file, dst_img)
                 results.write('{}\t{}\n'.format(img_file, label[0]))
-        except:
-            continue
+        except Exception as e:
+            print(e)
 
     results.close()
