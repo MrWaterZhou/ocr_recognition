@@ -6,7 +6,7 @@ import os
 import traceback
 
 
-def expand_bounding_box(points, shift=1.2):
+def expand_bounding_box(points, shift=1.5):
     points = np.array(points).astype(np.int)
     center, delta, angle = cv2.minAreaRect(points)
     delta_add = (delta[0] * shift, delta[1])
