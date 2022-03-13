@@ -8,7 +8,7 @@ import glob
 if __name__ == '__main__':
     image_path = sys.argv[1]
     augment_method = sys.argv[2]
-    augment_path = image_path + augment_method
+    augment_path = image_path + '_' + augment_method
     os.makedirs(augment_path,exist_ok=True)
 
     images = os.listdir(image_path)
