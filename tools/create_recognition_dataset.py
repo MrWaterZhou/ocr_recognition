@@ -33,7 +33,7 @@ def crop_minAreaRect(img, points):
     img_crop = img_rot[pts[1][1]:pts[0][1],
                pts[1][0]:pts[2][0]]
 
-    return img_crop, _
+    return img_crop, 0
 
 
 def get_rotate_crop_image(img, points):
