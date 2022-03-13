@@ -14,6 +14,28 @@ def expand_bounding_box(points, shift=1.05):
     return new_points.astype(np.int).tolist()
 
 
+def crop_minAreaRect(img, points):
+    # rotate img
+    points = np.array(points).astype(np.int)
+    rect = cv2.minAreaRect(points)
+    angle = rect[2]
+    rows, cols = img.shape[0], img.shape[1]
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+    img_rot = cv2.warpAffine(img, M, (cols, rows))
+
+    # rotate bounding box
+    rect0 = (rect[0], rect[1], 0.0)
+    box = cv2.boxPoints(rect0)
+    pts = np.int0(cv2.transform(np.array([box]), M))[0]
+    pts[pts < 0] = 0
+
+    # crop
+    img_crop = img_rot[pts[1][1]:pts[0][1],
+               pts[1][0]:pts[2][0]]
+
+    return img_crop, _
+
+
 def get_rotate_crop_image(img, points):
     '''
 
@@ -118,7 +140,8 @@ if __name__ == '__main__':
             image = cv2.imread(image_file)
             labels = load_mtwi_label(label_file, language)
             for j, label in enumerate(labels):
-                dst_img, rotate = get_rotate_crop_image(image, label[1])
+                # dst_img, rotate = get_rotate_crop_image(image, label[1])
+                dst_img, rotate = crop_minAreaRect(image, label[1])
                 img_file = os.path.join(save_path, '{}_{}_{}.jpg'.format(i, j, rotate))
                 cv2.imwrite(img_file, dst_img)
                 results.write('{}\t{}\n'.format(img_file, label[0]))
