@@ -9,6 +9,7 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
     augment_method = sys.argv[2]
     augment_path = image_path + augment_method
+    os.makedirs(augment_path,exist_ok=True)
 
     images = os.listdir(image_path)
 
@@ -25,4 +26,4 @@ if __name__ == '__main__':
             distort_img = aug_func(img, 4)
             cv2.imwrite(os.path.join(augment_path, im), distort_img)
         except:
-            pass
+            print(1)
