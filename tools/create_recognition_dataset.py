@@ -5,6 +5,14 @@ import glob
 import os
 
 
+def expand_bounding_box(points, shift=1.1):
+    points = np.array(points)
+    center, delta, angle = cv2.minAreaRect(points)
+    delta_add = (delta * shift, delta * shift)
+    new_points = cv2.boxPoints((center, delta_add, angle))
+    return new_points.astype(np.int).tolist()
+
+
 def get_rotate_crop_image(img, points):
     '''
 
@@ -12,8 +20,9 @@ def get_rotate_crop_image(img, points):
     :param points: list of points
     :return:
     '''
-    points = sorted(points, key=lambda x: x[0])
+    points = expand_bounding_box(points)
 
+    points = sorted(points, key=lambda x: x[0])
     index_1, index_2, index_3, index_4 = 0, 1, 2, 3
     if points[1][1] > points[0][1]:
         index_1 = 0
