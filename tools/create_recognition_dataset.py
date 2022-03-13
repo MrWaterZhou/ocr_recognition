@@ -3,6 +3,7 @@ import cv2
 import sys
 import glob
 import os
+import traceback
 
 
 def expand_bounding_box(points, shift=1.1):
@@ -122,6 +123,6 @@ if __name__ == '__main__':
                 cv2.imwrite(img_file, dst_img)
                 results.write('{}\t{}\n'.format(img_file, label[0]))
         except Exception as e:
-            print(e)
+            print(traceback.print_exc())
 
     results.close()
