@@ -11,7 +11,7 @@ def expand_bounding_box(points, shift=1.05):
     center, delta, angle = cv2.minAreaRect(points)
     delta_add = (delta[0] * shift, delta[1] * shift)
     new_points = cv2.boxPoints((center, delta_add, angle))
-    return new_points.tolist(), (center, delta_add, angle)
+    return new_points, (center, delta_add, angle)
 
 
 def get_rotate_crop_image_v2(img, points):
