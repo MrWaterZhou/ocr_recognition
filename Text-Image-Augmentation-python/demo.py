@@ -18,7 +18,7 @@ def create_gif(image_list, gif_name, duration=0.1):
 if __name__ == '__main__':
     im = cv2.imread(sys.argv[1])
     # im = cv2.resize(im, (200, 64))
-    cv2.imshow("im_CV", im)
+    # cv2.imshow("im_CV", im)
     distort_img_list = list()
     stretch_img_list = list()
     perspective_img_list = list()
