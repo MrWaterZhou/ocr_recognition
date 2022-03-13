@@ -41,8 +41,8 @@ def get_rotate_crop_image_v2(img, points):
     points = np.array(box)
     rect = cv2.minAreaRect(points.astype(np.int))
     ratio = 32 / min(rect[1])
-    w_crop = int(ratio * rect[1][0])
-    h_crop = int(ratio * rect[1][1])
+    h_crop = int(ratio * rect[1][0])
+    w_crop = int(ratio * rect[1][1])
 
     pts_std = np.float32([[0, 0], [w_crop, 0],
                           [w_crop, h_crop],
