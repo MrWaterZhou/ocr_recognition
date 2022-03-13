@@ -14,26 +14,51 @@ def expand_bounding_box(points, shift=1.05):
     return new_points.astype(np.int).tolist()
 
 
-def crop_minAreaRect(img, points):
-    # rotate img
-    points = np.array(points).astype(np.int)
-    rect = cv2.minAreaRect(points)
-    angle = rect[2]
-    rows, cols = img.shape[0], img.shape[1]
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
-    img_rot = cv2.warpAffine(img, M, (cols, rows))
+def get_rotate_crop_image_v2(img, points):
+    '''
 
-    # rotate bounding box
-    rect0 = (rect[0], rect[1], 0.0)
-    box = cv2.boxPoints(rect0)
-    pts = np.int0(cv2.transform(np.array([box]), M))[0]
-    pts[pts < 0] = 0
+    :param img: np.array
+    :param points: list of points
+    :return:
+    '''
 
-    # crop
-    img_crop = img_rot[pts[1][1]:pts[0][1],
-               pts[1][0]:pts[2][0]]
+    points = sorted(points, key=lambda x: x[0])
+    index_1, index_2, index_3, index_4 = 0, 1, 2, 3
+    if points[1][1] > points[0][1]:
+        index_1 = 0
+        index_4 = 1
+    else:
+        index_1 = 1
+        index_4 = 0
+    if points[3][1] > points[2][1]:
+        index_2 = 2
+        index_3 = 3
+    else:
+        index_2 = 3
+        index_3 = 2
 
-    return img_crop, 0
+    box = [points[index_1], points[index_2], points[index_3], points[index_4]]
+    points = np.array(box)
+    rect = cv2.minAreaRect(points.astype(np.int))
+    ratio = 32 / min(rect[1])
+    w_crop = int(ratio * rect[1][0])
+    h_crop = int(ratio * rect[1][1])
+
+    pts_std = np.float32([[0, 0], [w_crop, 0],
+                          [w_crop, h_crop],
+                          [0, h_crop]])
+
+    # pict channel 3 -> 1 following
+    #         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    M = cv2.getPerspectiveTransform(points.astype('float32'), pts_std)
+    dst_img = cv2.warpPerspective(
+        img,
+        M, (w_crop, h_crop),
+        borderMode=cv2.BORDER_REPLICATE,
+        flags=cv2.INTER_CUBIC)
+
+    return dst_img, 0
 
 
 def get_rotate_crop_image(img, points):
@@ -140,8 +165,7 @@ if __name__ == '__main__':
             image = cv2.imread(image_file)
             labels = load_mtwi_label(label_file, language)
             for j, label in enumerate(labels):
-                # dst_img, rotate = get_rotate_crop_image(image, label[1])
-                dst_img, rotate = crop_minAreaRect(image, label[1])
+                dst_img, rotate = get_rotate_crop_image_v2(image, label[1])
                 img_file = os.path.join(save_path, '{}_{}_{}.jpg'.format(i, j, rotate))
                 cv2.imwrite(img_file, dst_img)
                 results.write('{}\t{}\n'.format(img_file, label[0]))
