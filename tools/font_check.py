@@ -17,8 +17,10 @@ def check(char_set: set, font: TTFont):
             cmap_chars.add(chr(k))
             if table.cmap.get(k) is not None:
                 glyph_chars.add(chr(k))
-
-    return char_set - cmap_chars, char_set - glyph_chars
+    res = (char_set - cmap_chars).union(char_set - glyph_chars)
+    res = list(res)
+    res = '|'.join(res)
+    return res
 
 
 if __name__ == '__main__':
